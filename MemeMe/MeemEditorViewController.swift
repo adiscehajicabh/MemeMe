@@ -190,7 +190,7 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
         view.endEditing(true)
     }
     
-    // Opens image picker controller where with inputed source type and editing options.
+    // Opens image picker controller with inputed source type and editing options.
     func chooseSourceType(sourceType: UIImagePickerControllerSourceType, allowsEditing: Bool) {
         
         let imagePickerController = UIImagePickerController()
