@@ -67,13 +67,17 @@
                         <color key="backgroundColor" red="0.2470588235" green="0.24313725489999999" blue="0.38823529410000002" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="D7R-4M-agr" secondAttribute="trailing" id="1Kw-Ph-ura"/>
-                            <constraint firstItem="D7R-4M-agr" firstAttribute="top" secondItem="Wdn-dS-Xbf" secondAttribute="bottom" constant="-88" id="2DJ-sl-SaV"/>
+                            <constraint firstItem="lWN-W6-9Fp" firstAttribute="top" secondItem="TAY-dM-lz5" secondAttribute="bottom" constant="43" id="6tJ-n2-hXa">
+                                <variation key="heightClass=compact-widthClass=compact" constant="4"/>
+                            </constraint>
+                            <constraint firstItem="Wdn-dS-Xbf" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="43" id="8jA-oE-TFo">
+                                <variation key="heightClass=compact-widthClass=compact" constant="5"/>
+                            </constraint>
                             <constraint firstItem="lWN-W6-9Fp" firstAttribute="top" secondItem="D7R-4M-agr" secondAttribute="bottom" id="ATc-PJ-7Oq"/>
                             <constraint firstItem="lWN-W6-9Fp" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="BPr-lD-NqD"/>
                             <constraint firstAttribute="trailing" secondItem="lWN-W6-9Fp" secondAttribute="trailing" id="Bd8-eA-Qpp"/>
                             <constraint firstItem="TAY-dM-lz5" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="16" id="CLT-pw-ZrY"/>
                             <constraint firstItem="D7R-4M-agr" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Dcp-YD-3kT"/>
-                            <constraint firstItem="TAY-dM-lz5" firstAttribute="top" secondItem="D7R-4M-agr" secondAttribute="bottom" constant="-88" id="J0C-4s-98v"/>
                             <constraint firstItem="D7R-4M-agr" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="NWh-8y-P61"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="lWN-W6-9Fp" secondAttribute="bottom" id="Wc3-Vx-w1M"/>
                             <constraint firstAttribute="trailing" secondItem="Wdn-dS-Xbf" secondAttribute="trailing" constant="16" id="X3E-3F-LGx"/>
@@ -112,7 +116,7 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Y7w-u1-3BH" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="3pR-Ut-sqL">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="3pR-Ut-sqL">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
