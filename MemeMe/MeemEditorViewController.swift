@@ -52,20 +52,13 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     // Opens image picker controller where camera is displayed.
     @IBAction func pickAnImageFromCamera(_ sender: Any) {
         
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.sourceType = .camera
-        self.present(imagePickerController, animated: true, completion: nil)
+        chooseSourceType(sourceType: .camera, allowsEditing: false)
     }
     
     // Opens image picker controller where photo album is displayed.
     @IBAction func pickAnImageFromAlbum(_ sender: Any) {
         
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.allowsEditing = true
-        imagePickerController.sourceType = .photoLibrary
-        self.present(imagePickerController, animated: true, completion: nil)
+        chooseSourceType(sourceType: .photoLibrary, allowsEditing: true)
     }
     
     // Opens activity view controller for sharing created meme image.
@@ -143,7 +136,6 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
             NSStrokeWidthAttributeName : -3.0
         ]
         textField.delegate = self
-//        textField.contentVerticalAlignment = .center
         textField.textAlignment = NSTextAlignment.center
     }
     
@@ -173,8 +165,7 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     func generateMemedImage() -> UIImage {
         
         // Hide navbar and toolbar
-        self.navigationController?.navigationBar.isHidden = true
-        bottomToolbar.isHidden = true
+        hideToolbars(hide: true)
         
         // Render view to an image
         UIGraphicsBeginImageContext(self.view.frame.size)
@@ -183,8 +174,7 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
         UIGraphicsEndImageContext()
         
         // Show navbar and toolbar
-        self.navigationController?.navigationBar.isHidden = false
-        bottomToolbar.isHidden = false
+        hideToolbars(hide: false)
         
         return memedImage
     }
@@ -198,6 +188,22 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     // Resigns the first responder status.
     func dissmisKeyboard() {
         view.endEditing(true)
+    }
+    
+    // Opens image picker controller where with inputed source type and editing options.
+    func chooseSourceType(sourceType: UIImagePickerControllerSourceType, allowsEditing: Bool) {
+        
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.allowsEditing = allowsEditing
+        imagePickerController.sourceType = sourceType
+        self.present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    // Sets navbar and toolbar hidden.
+    func hideToolbars(hide: Bool) {
+        self.navigationController?.navigationBar.isHidden = hide
+        bottomToolbar.isHidden = hide
     }
     
     // MARK: Keyboard action methods
