@@ -1,5 +1,5 @@
 //
-//  MeemEditorViewController.swift
+//  MemeEditorViewController.swift
 //  MemeMe
 //
 //  Created by Adis Cehajic on 15/05/2017.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MeemEditorViewController: UIViewController, UINavigationControllerDelegate {
+class MemeEditorViewController: UIViewController, UINavigationControllerDelegate {
 
     // MARK: Outlet properties
     
@@ -18,14 +18,14 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var bottomToolbar: UIToolbar!
     @IBOutlet weak var shareButton: UIBarButtonItem!
-    @IBOutlet weak var cancelButton: UIBarButtonItem!
     
     // MARK: Properties
     
-    var topTextFieldEmptyText = "TOP"
-    var bottomTextFieldEmptyText = "BOTTOM"
+    let topTextFieldEmptyText = "TOP"
+    let bottomTextFieldEmptyText = "BOTTOM"
     var isTopTextFieldActive = false
-    var isKeyboardPresented = false
+    var meme: Meme?
+    var memeIndex: Int?
     
     // MARK: ViewController methods
     
@@ -33,6 +33,15 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
         super.viewDidLoad()
         
         setupMemeEditorAppearance()
+        
+        // If the meme is being edited set meme editor properties.
+        if memeIndex != nil {
+            meme = Meme.allMemes()[memeIndex!]
+            imagePickerView.image = meme?.originalImage
+            topTextField.text = meme?.topText
+            bottomTextField.text = meme?.bottomText
+            setupButtonsState()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,21 +58,17 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
 
     // MARK: Action methods
     
-    // Opens image picker controller where camera is displayed.
-    @IBAction func pickAnImageFromCamera(_ sender: Any) {
+    // Opens image picker controller where camera or photo library is displayed.
+    @IBAction func pickAnImage(_ sender: Any) {
         
-        chooseSourceType(sourceType: .camera, allowsEditing: false)
-    }
-    
-    // Opens image picker controller where photo album is displayed.
-    @IBAction func pickAnImageFromAlbum(_ sender: Any) {
-        
-        chooseSourceType(sourceType: .photoLibrary, allowsEditing: true)
+        chooseSourceType(sourceType: UIImagePickerControllerSourceType(rawValue: (sender as! UIBarButtonItem).tag)!)
     }
     
     // Opens activity view controller for sharing created meme image.
     @IBAction func shareImage(_ sender: Any) {
     
+        dissmisKeyboard()
+        
         // Create meme image and open share activity view controller.
         let memedImage = generateMemedImage()
         let activityViewController = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
@@ -73,7 +78,7 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
             activityViewController.popoverPresentationController?.sourceView = view
         }
         
-        self.present(activityViewController, animated: true, completion: nil)
+        present(activityViewController, animated: true, completion: nil)
         
         // Save the meme after it is shared.
         activityViewController.completionWithItemsHandler = {(activityType, completed, returnedItems, error) in
@@ -83,16 +88,22 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
                 return
             }
             
-            // Initialize and save meme.
-            let meme = Meme(topText: self.topTextField.text!, bottomText: self.bottomTextField.text!, originalImage: self.imagePickerView.image!, memedImage: memedImage)
-            meme.save()
-            self.reloadMeme()
+            if self.meme == nil {
+                // Initialize and save meme.
+                self.meme = Meme(topText: self.topTextField.text!, bottomText: self.bottomTextField.text!, originalImage: self.imagePickerView.image!, memedImage: memedImage)
+                self.meme!.save()
+            } else {
+                self.meme = Meme(topText: self.topTextField.text!, bottomText: self.bottomTextField.text!, originalImage: self.imagePickerView.image!, memedImage: memedImage)
+                Meme.update(meme: self.meme!, at: self.memeIndex!)
+            }
+
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
     // Reloads meme editor view to initial values.
     @IBAction func cancel(_ sender: Any) {
-        reloadMeme()
+        dismiss(animated: true, completion: nil)
     }
     
     // MARK: Private methods
@@ -111,7 +122,6 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     // Sets the state of the all buttons depending on the meme.
     func setupButtonsState() {
         shareButton.isEnabled = imagePickerView.image != nil
-        cancelButton.isEnabled = imagePickerView.image != nil
         topTextField.isEnabled = imagePickerView.image != nil
         bottomTextField.isEnabled = imagePickerView.image != nil
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
@@ -168,8 +178,8 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
         hideToolbars(hide: true)
         
         // Render view to an image
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
+        UIGraphicsBeginImageContextWithOptions(imagePickerView.frame.size, false, 0)
+        view.drawHierarchy(in: CGRect.init(x: -imagePickerView.frame.origin.x, y: -imagePickerView.frame.origin.y, width: view.frame.size.width, height: view.frame.size.height), afterScreenUpdates: true)
         let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
@@ -191,18 +201,18 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     // Opens image picker controller with inputed source type and editing options.
-    func chooseSourceType(sourceType: UIImagePickerControllerSourceType, allowsEditing: Bool) {
+    func chooseSourceType(sourceType: UIImagePickerControllerSourceType) {
         
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
-        imagePickerController.allowsEditing = allowsEditing
         imagePickerController.sourceType = sourceType
-        self.present(imagePickerController, animated: true, completion: nil)
+        imagePickerController.modalTransitionStyle = .crossDissolve
+        present(imagePickerController, animated: true, completion: nil)
     }
     
     // Sets navbar and toolbar hidden.
     func hideToolbars(hide: Bool) {
-        self.navigationController?.navigationBar.isHidden = hide
+        navigationController?.navigationBar.isHidden = hide
         bottomToolbar.isHidden = hide
     }
     
@@ -211,21 +221,21 @@ class MeemEditorViewController: UIViewController, UINavigationControllerDelegate
     // Called when keyboard will show and sets the view position above the top.
     func keyboardWillShow(_ notification: Notification) {
         
-        if !isTopTextFieldActive && !isKeyboardPresented {
-            view.frame.origin.y -= getKeyboardHeight(notification)
-            isKeyboardPresented = true
+        if bottomTextField.isFirstResponder {
+            view.frame.origin.y = getKeyboardHeight(notification) * -1
         }
     }
     
     // Called when keyboard will hide and sets the view position on the top.
     func keyboardWillHide(_ notification: Notification) {
         
-        view.frame.origin.y = 0
-        isKeyboardPresented = false
+        if bottomTextField.isFirstResponder {
+            view.frame.origin.y = 0
+        }
     }
 }
 
-extension MeemEditorViewController : UIImagePickerControllerDelegate {
+extension MemeEditorViewController : UIImagePickerControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
@@ -236,17 +246,17 @@ extension MeemEditorViewController : UIImagePickerControllerDelegate {
             imagePickerView.image = selectedImage
         }
         
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
         setupButtonsState()
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
         reloadMeme()
     }
 }
 
-extension MeemEditorViewController : UITextFieldDelegate {
+extension MemeEditorViewController : UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
